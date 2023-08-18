@@ -1,11 +1,26 @@
 import React, { useState} from 'react';
-import { TextInput } from 'react-native';
+import { FlatList, TextInput } from 'react-native';
 import { TouchableOpacityComponent } from 'react-native';
 import { SafeAreaView, Text, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import TaskItem from '../components/TaskItem';
+import ListHeader from '../components/ListHeader';
 const screenHeight = Dimensions.get('screen').height;
 export default function HomeScreen() {
     const [addNew, setAddNew] = useState(false);
     const [task, setTask] = useState('');
+    const [tasks, setTasks] = useState(['Programar App To-do']);
+
+    const addTask = () => {
+        setTasks(currentTasks => [...currentTasks, task]);
+        setTask('');
+        setAddNew(false);
+    }
+
+    const deleteTask = (index) => {
+        let temp = [...tasks];
+        temp.splice(index, 1);
+        setTasks(temp);
+    }
   return (
     <SafeAreaView style = {{marginHorizontal: 20,}} >
         {/*Contenedor del input*/}
@@ -13,7 +28,7 @@ export default function HomeScreen() {
             addNew && (
                 <View>
             <TextInput
-                onChange = {setTask}
+                onChangeText = {setTask}
                 placeholder = "Agrega una tarea"
                 style = {styles.input}
                 value = {task}
@@ -21,7 +36,9 @@ export default function HomeScreen() {
         
         <View style ={{marginVertical:  10, flexDirection:  'row'}}>
             <TouchableOpacity
-            style ={[styles.button, styles.acceptButton]}>
+            style ={[styles.button, styles.acceptButton]}
+            onPress={addTask}
+            >
                 <Text style = {styles.buttonText}>Agregar</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -34,7 +51,15 @@ export default function HomeScreen() {
             </View> 
             )
         }
-       
+       <View>
+        <FlatList
+        data = {tasks}
+        keyExtractor = {(item) => item}
+        renderItem = {({item, index}) => <TaskItem task ={item} onPress = {() => deleteTask(index)}/>}
+        ListHeaderComponent = {<ListHeader/>}
+        ItemSeparatorComponent={() => <View style ={{marginVertical: 4,}}/>}
+        />
+       </View>
         {/* Boton para agregar una tarea */}
         <View style = {styles.addButtonLocator}>
         <TouchableOpacity style ={ styles.addButton}
